@@ -26,8 +26,13 @@ $rules = [
 if ($_SERVER['REQUEST_METHOD'] === 'GET') {
 
     // Подключение шаблона с формой
-    $form_content = include_template('register.php');
-    
+    $form_content = include_template('register.php', [
+        'errors' => $errors,
+        'email_class' => $email_class,
+        'password_class' => $password_class,
+        'name_class' => $name_class
+    ]);
+
     $layout_content = include_template('layout.php', [
         'content' => $form_content,
         'title' => $title,
@@ -43,7 +48,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
 // Получение данных из формы регистрации
 $new_user = filter_input_array(INPUT_POST, ['email' => FILTER_DEFAULT, 'name' => FILTER_DEFAULT, 'password' => FILTER_DEFAULT], true);
 
-if (false == $new_user) {
+if (false === (bool)$new_user) {
     header("Location: index.php");
     exit;
 }
@@ -72,7 +77,10 @@ if (mysqli_fetch_row($sql_result)) {
 // Вывод сообщений об ошибочно заполненных полях формы
 if (count($errors)) {
     $form_content = include_template('register.php', [
-        'errors' => $errors
+        'errors' => $errors,
+        'email_class' => $email_class,
+        'password_class' => $password_class,
+        'name_class' => $name_class
     ]);
 
     $layout_content = include_template('layout.php', [

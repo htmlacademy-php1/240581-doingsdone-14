@@ -50,12 +50,12 @@
         <div class="form__input-file">
           <!--Вывод сообщения об ошибке заполнения поля загрузки файла -->
           <?php if (isset($errors['file'])) : ?>
-            <?php $classname = "form__input--error"; ?>
+            <?php $file_class = "form__input--error"; ?>
             <p class="form__message">
               <strong><?= $errors['file']; ?></strong>
             </p>
           <?php endif; ?>
-          <input class="visually-hidden <?= $classname ?>" type="file" name="file" id="file" value="">
+          <input class="visually-hidden <?= $file_class ?>" type="file" name="file" id="file" value="">
           <label class="button button--transparent" for="file">
             <span>Выберите файл</span>
           </label>

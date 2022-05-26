@@ -118,7 +118,7 @@ function output_error_sql($link, $error_template_data)
     $user = $error_template_data['user'];
     $year = $error_template_data['year'];
 
-    if (false == $user) {
+    if (false === (bool)$user) {
         $user['user_id'] = false;
         $user['user_name'] = false;
     }
@@ -126,6 +126,7 @@ function output_error_sql($link, $error_template_data)
     $error = mysqli_error($link);
 
     $error_content = include_template('error.php', ['error' => $error]);
+    
     $layout_content = include_template('layout.php', [
         'title' => $title,
         'content' => $error_content,
@@ -376,7 +377,7 @@ function get_prepare_stmt($link, $sql, array $data = [])
 
 /** 
  * Функция подготовки строки с дополнением к условию SQL-запроса к БД по дате для различных состояний блока фильтров
- * @param $filter - Переменная с номером фильтра из GET-запросаЖ
+ * @param int $filter - Переменная с номером фильтра из GET-запросаЖ
  * - 1 - Все задачи;
  * - 2 - Задачи на сегодня;
  * - 3 - Задачи на завтра;

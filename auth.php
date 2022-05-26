@@ -2,6 +2,11 @@
 
 require_once('init.php');
 
+if (isset($_SESSION['user_id'])) {
+    header("Location: index.php");
+    exit;
+}
+
 $error_message = 'Пожалуйста, исправьте ошибки в форме';
 
 // Массив с функциями для валидации полей формы запроса
@@ -17,9 +22,14 @@ $rules = [
 // Получение данных, введённых в поля формы
 $guest = filter_input_array(INPUT_POST, ['email' => FILTER_DEFAULT, 'password' => FILTER_DEFAULT], true);
 
-if (false == $guest) {
+if (false === (bool)$guest) {
     // Подключение шаблона с формой
-    $form_content = include_template('auth.php');
+    $form_content = include_template('auth.php', [
+        'errors' => $errors,
+        'error_message' => $error_message,
+        'email_class' => $email_class,
+        'password_class' => $password_class
+    ]);
 
     $layout_content = include_template('layout.php', [
         'content' => $form_content,
@@ -46,9 +56,11 @@ $errors = array_filter($errors);
 if (count($errors)) {
     $form_content = include_template('auth.php', [
         'errors' => $errors,
-        'error_message' => $error_message
+        'error_message' => $error_message,
+        'email_class' => $email_class,
+        'password_class' => $password_class
     ]);
-    
+
     $layout_content = include_template('layout.php', [
         'content' => $form_content,
         'title' => $title,
@@ -86,7 +98,9 @@ $errors['password'] = "Неверный пароль";
 
 $form_content = include_template('auth.php', [
     'errors' => $errors,
-    'error_message' => $error_message
+    'error_message' => $error_message,
+    'email_class' => $email_class,
+    'password_class' => $password_class
 ]);
 
 $layout_content = include_template('layout.php', [

@@ -20,6 +20,7 @@ if (!$user['user_id']) {
 // Получение параметров чекбокса задачи и её id из GET-запроса 
 $tasks_check = filter_input(INPUT_GET, 'check', FILTER_SANITIZE_NUMBER_INT);
 $task_id = filter_input(INPUT_GET, 'task_id', FILTER_SANITIZE_NUMBER_INT);
+
 $tasks_status = [
     'tasks_status' => $tasks_check,
     'user_id' => $user['user_id'],
@@ -47,17 +48,13 @@ mysqli_stmt_get_result($stmt);
 $projects = get_user_projects($link, $user['user_id'], $error_template_data);
 
 //Получение параметров чекбокса "Показывать выполненные" из GET-запроса
-$show_complete_tasks = filter_input(INPUT_GET, 'show_completed', FILTER_SANITIZE_NUMBER_INT);
-
-if (!$show_complete_tasks) {
-    $show_complete_tasks = 0;
-}
+$show_complete_tasks = (int)filter_input(INPUT_GET, 'show_completed', FILTER_SANITIZE_NUMBER_INT);
 
 // Получение id проекта из GET-запроса для фильтрации задач по проектам
 $project_id  = filter_input(INPUT_GET, 'id', FILTER_SANITIZE_NUMBER_INT);
 
 // Получение значения filter из GET-запроса для фильтрации задач в блоке фильтров
-$filter = filter_input(INPUT_GET, 'filter', FILTER_SANITIZE_NUMBER_INT);
+$filter = (int)filter_input(INPUT_GET, 'filter', FILTER_SANITIZE_NUMBER_INT);
 
 // Запрос к БД на получение списка ВСЕХ задач пользователя в зависимости от состояния блока фильтров задач
 $sql_add = preparation_insert_filtration($filter);
@@ -78,9 +75,10 @@ if ($project_id) {
 
     // Вывод ошибки 404 при несуществующем id проекта в полученном запросе
     $existence_project = mysqli_num_rows($sql_result);
-    
+
     if (false === $existence_project) {
         $content = include_template('404.php');
+
         $layoutContent = include_template('layout.php', [
             'title' => $title,
             'content' => $content,
@@ -89,7 +87,7 @@ if ($project_id) {
         ]);
 
         http_response_code(404);
-        
+
         print($layoutContent);
         exit();
     }
@@ -107,8 +105,8 @@ $not_found = false;
 
 // Полнотекстовый поиск по задачам пользователя
 if ($search) {
-    // Установка $show_complete_tasks в 1, чтобы в поиске отображались и выполненные задачи
-    $show_complete_tasks = 1;
+    // Установка $show_complete_tasks в 1, чтобы в результате поиска отображались и выполненные задачи
+    #$show_complete_tasks = 1;
     $search_request = $search . '*';
 
     $sql = "SELECT task_id, task_name, task_deadline, project_name, task_status, task_file FROM tasks t INNER JOIN projects p ON t.project_id = p.project_id WHERE t.user_id = ? AND MATCH (t.task_name) AGAINST(? IN BOOLEAN MODE)";
@@ -136,7 +134,6 @@ $main_content = include_template('main.php', [
     'show_complete_tasks' => $show_complete_tasks,
     'project_id' => $project_id,
     'not_found' => $not_found,
-    'search' => $search,
     'filter' => $filter
 ]);
 

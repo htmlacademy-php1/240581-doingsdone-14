@@ -12,16 +12,20 @@ $errors = [];
 $project = filter_input_array(INPUT_POST, ['name' => FILTER_DEFAULT], true);
 
 // Подключение шаблонов страниц
-if (false == $project) {
+if (false === (bool)$project) {
 
     $content_project = include_template('project_side.php', [
-        'projects' => $projects
+        'projects' => $projects,
+        'project_id' => $project_id,
+        'show_complete_tasks' => $show_complete_tasks,
+        'filter' => $filter
     ]);
 
     // Подключение шаблона с формой добавления задачи
     $form_content = include_template('add_project.php', [
         'content_project' => $content_project,
-        'projects' => $projects
+        'projects' => $projects,
+        'name_class' => $name_class
     ]);
 
     $layout_content = include_template('layout.php', [
@@ -50,12 +54,16 @@ if (!$errors['name']) {
 // Вывод сообщений об ошибочно заполненных полях формы добавления задачи
 if ($errors['name']) {
     $content_project = include_template('project_side.php', [
-        'projects' => $projects
+        'projects' => $projects,
+        'project_id' => $project_id,
+        'show_complete_tasks' => $show_complete_tasks,
+        'filter' => $filter
     ]);
 
     $form_content = include_template('add_project.php', [
         'content_project' => $content_project,
         'projects' => $projects,
+        'name_class' => $name_class,
         'user' => $user,
         'errors' => $errors
     ]);

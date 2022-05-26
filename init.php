@@ -2,14 +2,26 @@
 
 session_start();
 
+ini_set('display_errors', '1');
+
+ini_set('display_startup_errors', '1');
+
+error_reporting(E_ALL);
+
 require_once('vendor/autoload.php');
 require_once('helpers.php');
 require_once('config/mail.php');
 
 $data_base = require_once('config/db.php');
 
-// Title сайта
+//Инициализация переменных, используемых в шаблонах
 $title = 'Дела в порядке';
+$email_class = '';
+$password_class = '';
+$name_class = '';
+$project_class = '';
+$date_class = '';
+$file_class = '';
 
 // Массив с данными пользователя по умолчанию
 $user = [
