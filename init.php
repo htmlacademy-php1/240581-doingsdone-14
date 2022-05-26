@@ -23,6 +23,14 @@ $project_class = '';
 $date_class = '';
 $file_class = '';
 
+//Инициализация переменных, используемых в сценариях
+$project_id = false;
+$show_complete_tasks = 1;
+$filter = 1;
+$projects = [];
+$errors = [];
+$content = '';
+
 // Массив с данными пользователя по умолчанию
 $user = [
     'user_id' => false,
@@ -47,10 +55,6 @@ mysqli_set_charset($link, "utf8");
 if (!$link) {
     output_error_sql($link, $error_template_data);
 }
-
-$projects = [];
-$errors = [];
-$content = '';
 
 // Устанавливаем id и имя пользователя в сессии
 if (isset($_SESSION['user_id'])) {

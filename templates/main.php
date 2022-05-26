@@ -11,7 +11,7 @@
     <!-- Фильтр списка задач -->
     <div class="tasks-controls">
         <nav class="tasks-switch">
-            <a href="/index.php?id=<?= $project_id; ?>&filter=1&show_completed=<?= $show_complete_tasks; ?>" class="tasks-switch__item <?php if (1 === $filter || false === $filter) {
+            <a href="/index.php?id=<?= $project_id; ?>&filter=1&show_completed=<?= $show_complete_tasks; ?>" class="tasks-switch__item <?php if (1 === $filter || false === (bool)$filter) {
                                                                                                                                             echo 'tasks-switch__item--active';
                                                                                                                                         } ?>">Все задачи</a>
             <a href="/index.php?id=<?= $project_id; ?>&filter=2&show_completed=<?= $show_complete_tasks; ?>" class="tasks-switch__item <?php if (2 === $filter) {

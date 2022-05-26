@@ -51,7 +51,7 @@ $projects = get_user_projects($link, $user['user_id'], $error_template_data);
 $show_complete_tasks = (int)filter_input(INPUT_GET, 'show_completed', FILTER_SANITIZE_NUMBER_INT);
 
 // Получение id проекта из GET-запроса для фильтрации задач по проектам
-$project_id  = filter_input(INPUT_GET, 'id', FILTER_SANITIZE_NUMBER_INT);
+$project_id  = (int)filter_input(INPUT_GET, 'id', FILTER_SANITIZE_NUMBER_INT);
 
 // Получение значения filter из GET-запроса для фильтрации задач в блоке фильтров
 $filter = (int)filter_input(INPUT_GET, 'filter', FILTER_SANITIZE_NUMBER_INT);
