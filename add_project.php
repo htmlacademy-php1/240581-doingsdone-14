@@ -6,8 +6,6 @@ $projects = get_user_projects($link, $user['user_id'], $error_template_data);
 
 $project_names = array_column($projects, 'project_name');
 
-$errors = [];
-
 // Получение запроса из формы
 $project = filter_input_array(INPUT_POST, ['name' => FILTER_DEFAULT], true);
 

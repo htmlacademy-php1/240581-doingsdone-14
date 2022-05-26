@@ -7,8 +7,6 @@ $projects = get_user_projects($link, $user['user_id'], $error_template_data);
 
 $project_ids = array_column($projects, 'project_id');
 
-$errors = [];
-
 // Массив с функциями для валидации полей формы запроса
 $rules = [
     'name' => function ($value) {
