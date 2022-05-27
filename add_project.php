@@ -1,6 +1,12 @@
 <?php
 require_once('init.php');
 
+// Если пользователь не авторизован, то при попытке открыть страницу добавления проекта он будет перенаправлен на главную страницу
+if (false === $user['user_id']) {
+    header("Location: index.php");
+    exit;
+}
+
 // Запрос в БД списка проектов пользователя и количества задач в каждом из них
 $projects = get_user_projects($link, $user['user_id'], $error_template_data);
 

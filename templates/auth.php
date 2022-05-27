@@ -37,7 +37,7 @@
 
       <div class="form__row form__row--controls">
         <!-- Вывод сообщения об ошибке заполнения формы -->
-        <?php if (isset($errors)) : ?>
+        <?php if (count($errors)) : ?>
           <p class="error-message"><?= $error_message; ?></p>
         <?php endif; ?>
         <input class="button" type="submit" name="" value="Войти">

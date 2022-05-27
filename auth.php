@@ -7,8 +7,6 @@ if (isset($_SESSION['user_id'])) {
     exit;
 }
 
-$error_message = 'Пожалуйста, исправьте ошибки в форме';
-
 // Массив с функциями для валидации полей формы запроса
 $rules = [
     'email' => function ($value) {

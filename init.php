@@ -16,6 +16,7 @@ $data_base = require_once('config/db.php');
 
 //Инициализация переменных, используемых в шаблонах
 $title = 'Дела в порядке';
+$error_message = 'Пожалуйста, исправьте ошибки в форме';
 $email_class = '';
 $password_class = '';
 $name_class = '';

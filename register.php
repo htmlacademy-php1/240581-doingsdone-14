@@ -28,6 +28,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
     // Подключение шаблона с формой
     $form_content = include_template('register.php', [
         'errors' => $errors,
+        'error_message' => $error_message,
         'email_class' => $email_class,
         'password_class' => $password_class,
         'name_class' => $name_class
@@ -78,6 +79,7 @@ if (mysqli_fetch_row($sql_result)) {
 if (count($errors)) {
     $form_content = include_template('register.php', [
         'errors' => $errors,
+        'error_message' => $error_message,
         'email_class' => $email_class,
         'password_class' => $password_class,
         'name_class' => $name_class
