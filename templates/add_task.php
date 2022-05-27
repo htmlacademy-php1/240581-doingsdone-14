@@ -64,8 +64,8 @@
 
       <div class="form__row form__row--controls">
         <!-- Вывод сообщения об ошибке заполнения формы -->
-        <?php if (isset($errors)) : ?>
-          <p class="error-message">Пожалуйста, исправьте ошибки в форме</p>
+        <?php if (count($errors)) : ?>
+          <p class="error-message"><?= $error_message; ?></p>
         <?php endif; ?>
         <input class="button" type="submit" name="" value="Добавить">
       </div>

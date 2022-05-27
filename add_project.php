@@ -29,7 +29,9 @@ if (false === (bool)$project) {
     $form_content = include_template('add_project.php', [
         'content_project' => $content_project,
         'projects' => $projects,
-        'name_class' => $name_class
+        'name_class' => $name_class,
+        'user' => $user,
+        'errors' => $errors
     ]);
 
     $layout_content = include_template('layout.php', [

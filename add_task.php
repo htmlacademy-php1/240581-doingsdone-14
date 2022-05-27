@@ -45,7 +45,9 @@ if (false === (bool)$task) {
         'name_class' => $name_class,
         'project_class' => $project_class,
         'date_class' => $date_class,
-        'file_class' => $file_class
+        'file_class' => $file_class,
+        'errors' => $errors,
+        'error_message' => $error_message
     ]);
 
     $layout_content = include_template('layout.php', [
@@ -121,8 +123,12 @@ if (count($errors)) {
     $form_content = include_template('add_task.php', [
         'content_project' => $content_project,
         'projects' => $projects,
-        'user' => $user,
-        'errors' => $errors
+        'name_class' => $name_class,
+        'project_class' => $project_class,
+        'date_class' => $date_class,
+        'file_class' => $file_class,
+        'errors' => $errors,
+        'error_message' => $error_message
     ]);
 
     $layout_content = include_template('layout.php', [
