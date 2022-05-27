@@ -105,8 +105,6 @@ $not_found = false;
 
 // Полнотекстовый поиск по задачам пользователя
 if ($search) {
-    // Установка $show_complete_tasks в 1, чтобы в результате поиска отображались и выполненные задачи
-    #$show_complete_tasks = 1;
     $search_request = $search . '*';
 
     $sql = "SELECT task_id, task_name, task_deadline, project_name, task_status, task_file FROM tasks t INNER JOIN projects p ON t.project_id = p.project_id WHERE t.user_id = ? AND MATCH (t.task_name) AGAINST(? IN BOOLEAN MODE)";
