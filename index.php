@@ -19,8 +19,8 @@ if (!$user['user_id']) {
 }
 
 // Получение параметров чекбокса задачи и её id из GET-запроса 
-$tasks_check = filter_input(INPUT_GET, 'check', FILTER_SANITIZE_NUMBER_INT);
-$task_id = filter_input(INPUT_GET, 'task_id', FILTER_SANITIZE_NUMBER_INT);
+$tasks_check = (int)filter_input(INPUT_GET, 'check', FILTER_SANITIZE_NUMBER_INT);
+$task_id = (int)filter_input(INPUT_GET, 'task_id', FILTER_SANITIZE_NUMBER_INT);
 
 $tasks_status = [
     'tasks_status' => $tasks_check,
