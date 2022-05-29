@@ -246,7 +246,7 @@ function compose_sql_user_tasks($sql_filter_add, $project_id = false, $search = 
         $sql_insert = "AND MATCH (t.task_name) AGAINST(? IN BOOLEAN MODE)";
     }
 
-    $sql = "SELECT task_id, task_name, task_deadline, project_name, task_status, task_file FROM tasks t " . $join . "JOIN projects p ON t.project_id = p.project_id WHERE t.user_id = ? " . $sql_insert;
+    $sql = "SELECT task_id, task_name, DATE_FORMAT(task_deadline, '%Y-%m-%d') AS task_deadline, project_name, task_status, task_file FROM tasks t " . $join . "JOIN projects p ON t.project_id = p.project_id WHERE t.user_id = ? " . $sql_insert;
 
     return $sql;
 }
