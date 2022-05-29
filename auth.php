@@ -1,6 +1,8 @@
 <?php
+// Сценарий входа на страницу
 
 require_once('init.php');
+
 // Если пользователь уже авторизован, то перенаправление на главную страницу
 if (isset($_SESSION['user_id'])) {
     header("Location: index.php");
@@ -20,8 +22,8 @@ $rules = [
 // Получение данных, введённых в поля формы
 $guest = filter_input_array(INPUT_POST, ['email' => FILTER_DEFAULT, 'password' => FILTER_DEFAULT], true);
 
+// Подключение шаблона с формой
 if (false === (bool)$guest) {
-    // Подключение шаблона с формой
     $form_content = include_template('auth.php', [
         'errors' => $errors,
         'error_message' => $error_message,
@@ -78,8 +80,10 @@ if (!count($errors)) {
     $sql = "SELECT user_email, user_password, user_id, user_name FROM users WHERE user_email = ?";
 
     $sql_result = get_result_prepare_sql($link, $sql, $guest_email);
+
     $user_data = mysqli_fetch_array($sql_result, MYSQLI_ASSOC);
 }
+
 // Перенаправление зарегистрированного пользователя при валидном пароле 
 if ($user_data && password_verify($_POST['password'], $user_data['user_password'])) {
     $user_password = $user_data['user_password'];
@@ -89,6 +93,7 @@ if ($user_data && password_verify($_POST['password'], $user_data['user_password'
 
     header("Location: index.php");
 }
+
 // Вывод сообщения о неверном пароле при несовпаденых email или пароля
 $error_message = 'Вы ввели неверный email/пароль';
 $errors['email'] = "";

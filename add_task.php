@@ -1,4 +1,5 @@
 <?php
+// Сценарий добавления задач
 
 require_once('init.php');
 
