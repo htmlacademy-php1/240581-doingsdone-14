@@ -1,4 +1,5 @@
 <?php
+// Формулы, используемые в проекте
 
 /**
  * Функция проверки переданной даты на соответствие формату 'ГГГГ-ММ-ДД'
@@ -18,8 +19,8 @@ function validate_date(string $date)
 {
     $format_to_check = 'YYYY-mm-dd';
     $dateTimeObj = date_create_from_format($format_to_check, $date);
-    
-    if ($dateTimeObj !== false && array_sum(date_get_last_errors()) === 0) {
+
+    if (false !== $dateTimeObj && 0 === array_sum(date_get_last_errors())) {
         return 'Введите дату в формате «ГГГГ-ММ-ДД»';
     }
 
@@ -39,7 +40,7 @@ function db_get_prepare_stmt($link, $sql, $data = [])
 {
     $stmt = mysqli_prepare($link, $sql);
 
-    if ($stmt === false) {
+    if (false === $stmt) {
         $errorMsg = 'Не удалось инициализировать подготовленное выражение: ' . mysqli_error($link);
         die($errorMsg);
     }
@@ -126,7 +127,7 @@ function output_error_sql($link, $error_template_data)
     $error = mysqli_error($link);
 
     $error_content = include_template('error.php', ['error' => $error]);
-    
+
     $layout_content = include_template('layout.php', [
         'title' => $title,
         'content' => $error_content,
@@ -220,6 +221,37 @@ function get_user_projects($link, $id, $error_template_data)
 }
 
 /**
+ * Функция составления SQL-запроса в БД на выборку списка задач пользователя в зависимости от поискового запроса и состояния блоков фильтров проектов и задач
+ *
+ * @param int $project_id - id требуемого проекта
+ * @param string $sql_filter_add - переменная с дополнением к условию SQL-запроса к БД по дате для различных состояний блока фильтров
+ * @param string $search - строка пользовательского запроса на поиск задач 
+ * 
+ * @return string Итоговая строка SQL-запроса
+ */
+function compose_sql_user_tasks($sql_filter_add, $project_id = false, $search = false)
+{
+    $sql_project_add = "";
+    $join = "LEFT ";
+
+    if ($project_id) {
+        $sql_project_add = "AND t.project_id = ? ";
+        $join = "INNER ";
+    }
+
+    $sql_insert = $sql_project_add . $sql_filter_add . "ORDER BY task_date_create";
+
+    if ($search) {
+        $join = "INNER ";
+        $sql_insert = "AND MATCH (t.task_name) AGAINST(? IN BOOLEAN MODE)";
+    }
+
+    $sql = "SELECT task_id, task_name, task_deadline, project_name, task_status, task_file FROM tasks t " . $join . "JOIN projects p ON t.project_id = p.project_id WHERE t.user_id = ? " . $sql_insert;
+
+    return $sql;
+}
+
+/**
  *Фильтрация текстового поля, полученного из POST-запрося
  *@param $name - фильтруемая строка
  *
@@ -244,6 +276,37 @@ function validate_project($id, $allowed_list)
     }
 
     return null;
+}
+
+/**
+ * Функция проверки существования id проекта в полученном запросе
+ * 
+ * @param $link mysqli Ресурс соединения
+ * @param array $user Массив с id пользователя
+ * @param $project_id - id проекта
+ * @param $sql string SQL-запрос с плейсхолдерами вместо значений
+ * @param array $sql_data Данные для вставки на место плейсхолдеров
+ * 
+ * @return - true | false
+ */
+function validate_project_id($link, $user, $project_id)
+{
+    $sql_data = [
+        $user['user_id'],
+        $project_id
+    ];
+
+    $sql = "SELECT project_id FROM projects WHERE user_id = ? AND project_id = ?";
+
+    $sql_result = get_result_prepare_sql($link, $sql, $sql_data);
+
+    $project_id = mysqli_fetch_all($sql_result, MYSQLI_ASSOC);
+
+    if ($project_id) {
+        return true;
+    }
+
+    return false;
 }
 
 /**
@@ -326,7 +389,7 @@ function validate_email($value)
 }
 
 /**
- *Функция для подготовки SQL-запросов к выполнению. Использована в запросах на изменение данных, т.к. имеющаяся функция get_result_prepare_sql() /См. выше/ в таких запросах прилюбых результатах возвращает false
+ *Функция для подготовки SQL-запросов к выполнению. Использована в запросах на ИЗМЕНЕНИЕ данных, т.к. имеющаяся функция get_result_prepare_sql() /См. выше/ в таких запросах прилюбых результатах возвращает false
  *Подготавливает SQL-выражение к выполнению
  *@param $link mysqli - Ресурс соединения
  *@param $sql string - SQL запрос с плейсхолдерами вместо значений
@@ -387,21 +450,21 @@ function get_prepare_stmt($link, $sql, array $data = [])
  */
 function preparation_insert_filtration($filter)
 {
-    $sql_add = "";
+    $sql_filter_add = "";
 
     if (2 === $filter) {
-        $sql_add = "AND DATE(task_deadline) = CURDATE() ";
+        $sql_filter_add = "AND DATE(task_deadline) = CURDATE() ";
     }
 
     if (3 === $filter) {
-        $sql_add = "AND DATE(task_deadline) = DATE_ADD(CURDATE(), INTERVAL 1 DAY) ";
+        $sql_filter_add = "AND DATE(task_deadline) = DATE_ADD(CURDATE(), INTERVAL 1 DAY) ";
     }
 
     if (4 === $filter) {
-        $sql_add = "AND DATE(task_deadline) < CURDATE() ";
+        $sql_filter_add = "AND DATE(task_deadline) < CURDATE() ";
     }
 
-    return $sql_add;
+    return $sql_filter_add;
 }
 
 /** Функция mb_ucfirst предназначена для преобразования первой буквы строки в "ВЕРХНИЙ РЕГИСТР".

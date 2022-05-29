@@ -149,7 +149,6 @@ $sql = "INSERT INTO tasks (user_id, task_name, project_id, task_date_create, tas
 
 $stmt = get_prepare_stmt($link, $sql, $task) ?? output_error_sql($link, $error_template_data);
 
-
 $result = mysqli_stmt_execute($stmt) ?? output_error_sql($link, $error_template_data);
 
 $sql_result = mysqli_stmt_get_result($stmt);

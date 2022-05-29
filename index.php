@@ -1,8 +1,9 @@
 <?php
+// Сценарий главной страницы
 
 require_once('init.php');
 
-//Подключение лейаута для анонимного посетителя
+//Подключение лейаута для анонимного посетителя (гостевая страница)
 if (!$user['user_id']) {
     $guest_content = include_template('guest.php');
 
@@ -53,44 +54,43 @@ $show_complete_tasks = (int)filter_input(INPUT_GET, 'show_completed', FILTER_SAN
 // Получение id проекта из GET-запроса для фильтрации задач по проектам
 $project_id  = (int)filter_input(INPUT_GET, 'id', FILTER_SANITIZE_NUMBER_INT);
 
-// Получение значения filter из GET-запроса для фильтрации задач в блоке фильтров
+// Получение состояния блока фильтра задач из GET-запроса для фильтрации задач в блоке фильтров
 $filter = (int)filter_input(INPUT_GET, 'filter', FILTER_SANITIZE_NUMBER_INT);
 
 // Запрос к БД на получение списка ВСЕХ задач пользователя в зависимости от состояния блока фильтров задач
-$sql_add = preparation_insert_filtration($filter);
+$sql_filter_add = preparation_insert_filtration($filter);
 
-$sql = "SELECT task_id, task_name, task_deadline, project_name, task_status, task_file FROM tasks t LEFT JOIN projects p ON t.project_id = p.project_id WHERE t.user_id = ? " . $sql_add . "ORDER BY task_date_create";
+$sql = compose_sql_user_tasks($sql_filter_add);
 
 $sql_data = [$user['user_id']];
+
 $sql_result = get_result_prepare_sql($link, $sql, $sql_data);
+
+// Проверка полученного id проекта из GET-запроса на существование у пользователя и вывод ошибки 404 при несуществующем id проекта
+if ($project_id && false === validate_project_id($link, $user, $project_id)) {
+    $content = include_template('404.php');
+
+    $layoutContent = include_template('layout.php', [
+        'title' => $title,
+        'content' => $content,
+        'user' => $user,
+        'year' => $year
+    ]);
+
+    http_response_code(404);
+
+    print($layoutContent);
+    exit();
+}
 
 // Запрос к БД на получение списка задач в ВЫБРАННОМ проекте в зависимости от состояния блока фильтров задач
 if ($project_id) {
-    $sql_add = preparation_insert_filtration($filter);
 
-    $sql = "SELECT task_id, task_name, task_deadline, project_name, task_status, task_file FROM tasks t INNER JOIN projects p ON t.project_id = p.project_id WHERE t.user_id = ? AND t.project_id = ? " . $sql_add . "ORDER BY task_date_create";
+    $sql = compose_sql_user_tasks($sql_filter_add, $project_id);
 
     $sql_data = [$user['user_id'], $project_id];
+
     $sql_result = get_result_prepare_sql($link, $sql, $sql_data);
-
-    // Вывод ошибки 404 при несуществующем id проекта в полученном запросе
-    $existence_project = mysqli_num_rows($sql_result);
-
-    if (false === $existence_project) {
-        $content = include_template('404.php');
-
-        $layoutContent = include_template('layout.php', [
-            'title' => $title,
-            'content' => $content,
-            'user' => $user,
-            'year' => $year
-        ]);
-
-        http_response_code(404);
-
-        print($layoutContent);
-        exit();
-    }
 }
 
 $tasks = mysqli_fetch_all($sql_result, MYSQLI_ASSOC);
@@ -107,10 +107,12 @@ $not_found = false;
 if ($search) {
     $search_request = $search . '*';
 
-    $sql = "SELECT task_id, task_name, task_deadline, project_name, task_status, task_file FROM tasks t INNER JOIN projects p ON t.project_id = p.project_id WHERE t.user_id = ? AND MATCH (t.task_name) AGAINST(? IN BOOLEAN MODE)";
+    $sql = compose_sql_user_tasks($sql_filter_add, $project_id, $search);
 
     $sql_data = [$user['user_id'], $search_request];
+
     $sql_result = get_result_prepare_sql($link, $sql, $sql_data);
+
     $tasks = mysqli_fetch_all($sql_result, MYSQLI_ASSOC);
 
     if (!$tasks) {

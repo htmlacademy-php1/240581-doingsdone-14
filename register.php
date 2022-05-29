@@ -1,4 +1,5 @@
 <?php
+// Сценарий регистрации пользователя
 
 require_once('init.php');
 
@@ -23,6 +24,7 @@ $rules = [
     }
 ];
 
+// Проверка на наличие данных, переданных по методу 'GET'. Если нет, то проводим дальнейшую обработку
 if ($_SERVER['REQUEST_METHOD'] === 'GET') {
 
     // Подключение шаблона с формой
@@ -49,6 +51,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
 // Получение данных из формы регистрации
 $new_user = filter_input_array(INPUT_POST, ['email' => FILTER_DEFAULT, 'name' => FILTER_DEFAULT, 'password' => FILTER_DEFAULT], true);
 
+// Если нет данных по методу "POST", переводим пользователя на главную (гостевую) страницу
 if (false === (bool)$new_user) {
     header("Location: index.php");
     exit;

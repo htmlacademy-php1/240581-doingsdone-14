@@ -1,7 +1,7 @@
 <?php
 
 require_once('init.php');
-
+// Если пользователь уже авторизован, то перенаправление на главную страницу
 if (isset($_SESSION['user_id'])) {
     header("Location: index.php");
     exit;
